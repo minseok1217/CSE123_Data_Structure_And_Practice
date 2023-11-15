@@ -1,6 +1,4 @@
 from Point3D import Function, Complex, Point3D
-
-
 def useFunction():
     f1 = Function()
     # n=5
