@@ -1,4 +1,6 @@
-from collections import deque
+from queue import Queue, LifoQueue
+# from Graph import Graph
+from collections import defaultdict
 
 class Graph:
     def __init__(self):
@@ -36,95 +38,115 @@ class Graph:
             for neighbor, weight in neighbors.items():
                 print(f"{vertex} --- {neighbor} : {weight}")
 
-    def dfs(self, start_vertex):
+    def getGraphs():
+        graph1 = Graph()
+        return graph1
+        
+
+class SearchGraph:
+
+    def bfs(self, adjlist, start):
         visited = set()
-        self._dfs_recursive(start_vertex, visited)
+        print("BFS starting with Vertex", start)
+        visited.add(start)
+        q = Queue()
+        q.put(start)
+        while not q.empty():
+            v = q.get()
+            print(v, end='->')
+            nbr = adjlist[v]
+            for u in nbr:
+                if u not in visited:
+                    visited.add(u)
+                    q.put(u)
+        print()
 
-    def _dfs_recursive(self, vertex, visited):
-        if vertex not in visited:
-            print(vertex, end=' ')
-            visited.add(vertex)
-            for neighbor in self.vertices[vertex]:
-                self._dfs_recursive(neighbor, visited)
-
-    def bfs(self, start_vertex):
+    def dfs(self, adjList, start):
         visited = set()
-        queue = deque([start_vertex])
+        print("DFS starting with Vertex", start)
+        visited.add(start)
+        s = LifoQueue()
+        s.put(start)
+        while not s.empty():
+            v = s.get()
+            print(v, end='->')
+            nbr = adjList[v]
+            for u in nbr:
+                if u not in visited:
+                    visited.add(u)
+                    s.put(u)
+        print()
 
-        while queue:
-            vertex = queue.popleft()
-            if vertex not in visited:
-                print(vertex, end=' ')
-                visited.add(vertex)
-                queue.extend(neighbor for neighbor in self.vertices[vertex] if neighbor not in visited)
-    
-    def connected_components(graph):
+    def doTS(self, adjList):
+        visited = defaultdict()
+        for vtx in adjList:
+            visited[vtx] = False
+        result = []
+        for v in visited:
+            self.dfsTS(v, adjList, visited, result)
+        print(result)
+
+    def dfsTS(self, v, adjList, visited, result):
+        if not visited[v]:
+            visited[v] = True
+            for n in adjList[v]:
+                self.dfsTS(n, adjList, visited, result)
+            result.insert(0, v)
+
+    def findCC(self, adjList):
         visited = set()
-        components = []
-        for vertex in graph.vertices:
-            if vertex not in visited:
-                component = []
-                graph._dfs_recursive_connected_components(vertex, visited, component)
-                components.append(component)
-        return components
+        colorList = []
+        for v in adjList:
+            if v not in visited:
+                color = self.dfsCC(adjList, [], v, visited)
+                colorList.append(color)
+        print("Connected Components = {}".format(len(colorList)))
+        print(colorList)
+        print()
 
-    # Graph 클래스에 연결 요소 구하는 보조 함수 추가
-    def _dfs_recursive_connected_components(self, vertex, visited, component):
-        if vertex not in visited:
-            visited.add(vertex)
-            component.append(vertex)
-            for neighbor in self.vertices[vertex]:
-                self._dfs_recursive_connected_components(neighbor, visited, component)
+    def dfsCC(self, adjList, color, v, visited):
+        if v not in visited:
+            visited.add(v)
+            color.append(v)
+            n = adjList[v]
+            for vtx in n:
+                if vtx not in visited:
+                    self.dfsCC(adjList, color, vtx, visited)
+        return color
 
-    def topological_sort(graph):
-        visited = set()
-        stack = []
-        for vertex in graph.vertices:
-            if vertex not in visited:
-                graph._dfs_recursive_topological_sort(vertex, visited, stack)
-        return stack[::-1]
 
-    # Graph 클래스에 위상 정렬을 위한 보조 함수 추가
-    def _dfs_recursive_topological_sort(self, vertex, visited, stack):
-        if vertex not in visited:
-            visited.add(vertex)
-            for neighbor in self.vertices[vertex]:
-                self._dfs_recursive_topological_sort(neighbor, visited, stack)
-            stack.append(vertex)
+class EightQueen:
+    def __init__(self, NQ):
+        self.NQ = NQ
+        self.solutions = 0
+        self.nn = 0
 
-    def n_queens(n):
-        def is_safe(board, row, col):
-            # Check in the same column
-            for i in range(row):
-                if board[i] == col or \
-                board[i] - i == col - row or \
-                board[i] + i == col + row:
-                    return False
-            return True
+    def solve(self):
+        board = [-1] * self.NQ
+        self.dfsPQ(board, 0)
+        print("Found", self.solutions, "solutions.")
+        print("Node Visited = ", self.nn, "solutions.")
 
-def solve_queens(board, row):
-    if row == n:
-        solutions.append(board[:])  # Found a solution
-        return
-    for col in range(n):
-        if is_safe(board, row, col):
-            board[row] = col
-            solve_queens(board, row + 1)
+    def dfsPQ(self, board, row):
+        if row == self.NQ:
+            print(board)
+            self.solutions += 1
 
-    solutions = []
-    solve_queens([0] * n, 0)
-    return solutions
+        else:
+            for col in range(self.NQ):
+                if not self.isAttack(board, row, col):
+                    self.nn += 1
+                    board[row] = col
+                    self.dfsPQ(board, row + 1)
 
-def n_queens(n):
-    def is_safe(board, row, col):
-        # Check in the same column
+    def isAttack(self, board, row, col):
         for i in range(row):
             if board[i] == col or \
-               board[i] - i == col - row or \
-               board[i] + i == col + row:
-                return False
-        return True
-
+                    board[i] - i == col - row or \
+                    board[i] + i == col + row:
+                return True
+        return False
+    
 # Creating Graph objects
 graph1 = Graph()
 graph2 = Graph()
@@ -194,15 +216,73 @@ graph3.add_edge3("v7", "v5", 6)
 graph3.add_edge3("v5", "v2", 10)
 graph3.add_edge3("v2", "v1", 2)
 
-# 그래프 객체 생성 및 DFS, BFS 테스트
-print("DFS on Graph 1:")
-graph1.bfs("A")
+# Displaying the graphs
+print("Graph 1:")
+graph1.display1()
 
+print("\nGraph 2:")
+graph2.display2()
 
-print("\nBFS on Graph 2:")
-graph2.bfs("v1")
+print("\nGraph 3:")
+graph3.display3()
 
-n_queens_solutions = n_queens(4)
-print("\nSolutions for N-Queens Problem (N=4):")
-for solution in n_queens_solutions:
-    print(solution)
+def useSearchGraph():
+
+    print("Figures 1 : ")
+    sg = SearchGraph()
+    gg = getGraphs()
+    g = graph1
+    aL1 = g.getAdjList()
+    sv = g.getVertexList()[0]
+
+    print(sv)
+
+    sg.dfs(aL1, sv)
+    sg.bfs(aL1, sv)
+    print()
+
+    print("Figures 2 : ")
+    sg = SearchGraph()
+    gg = getGraphs()
+    g = graph2
+    aL2 = g.getAdjList()
+    sv = g.getVertexList()[0]
+
+    sg.dfs(aL2, sv)
+    sg.bfs(aL2, sv)
+    print()
+
+    print("Figures 3 : ")
+    sg = SearchGraph()
+    gg = getGraphs()
+    g = graph3
+    aL3 = g.getAdjList()
+    sv = g.getVertexList()[0]
+
+    sg.dfs(aL3, sv)
+    sg.bfs(aL3, sv)
+    print()
+
+    print("Figures 1 : ", end='')
+    sg.doTS(aL1)
+    print("Figures 2 : ", end='')
+    sg.doTS(aL2)
+    print("FiDDgures 3 : ", end='')
+    sg.doTS(aL3)
+
+    print("Figures 1 : ", end='')
+    sg.findCC(aL1)
+    print("Figures 2 : ", end='')
+    sg.findCC(aL2)
+    print("Figures 3 : ", end='')
+    sg.findCC(aL3)
+
+    eq = EightQueen(6)
+    eq.solve()
+    print()
+    
+def main():
+    useSearchGraph()
+
+if __name__ == "__main__":
+    main()

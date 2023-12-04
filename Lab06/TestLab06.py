@@ -52,11 +52,11 @@ def testBinarySearchTree() :
     tree.printLevelOrder(" original: LevelOrder: ")
     tree.delete_bst(3)
     tree.printLevelOrder("  casel: < 3 >: LevelOrder: ")
-    tree.delete_bst(68);
+    tree.delete_bst(68)
     tree.printLevelOrder("  case2: < 68 >: LevelOrder: ")
-    tree.delete_bst(18);
+    tree.delete_bst(18)
     tree.printLevelOrder("  case3: < 18 > LevelOrder: ")
-    tree.delete_bst(35);
+    tree.delete_bst(35)
     tree.printLevelOrder("  case3: < 35 > root: LevelOrder: ")
     print(" Nodes = %d" % tree.countNode(tree.root))
     print(" Leaf Nodes = %d" % tree.countLeaf(tree.root))
@@ -68,6 +68,8 @@ def testHuffman():
     text = "sdflasfa"
     hc = Huffman(text)
     hc.printCodes()
+    
+    
 def BFS01(n):
     queue = Queue()
     queue.put(n)
